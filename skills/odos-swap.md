@@ -68,12 +68,17 @@ or if `fromToken` is the native gas token.
 
 ```bash
 router=$(curl -sS "https://api.odos.xyz/info/router/v3/${chainId}" | jq -r '.address')
-cast send "$fromToken" "approve(address,uint256)" "$router" "$amount" \
+
+# Always approve only the amount you're about to swap, plus a tiny buffer
+# for rounding (the Odos router consumes at most $amount per swap).
+approveAmount=$(python3 -c "print(int(${amount}) * 101 // 100)")  # +1%
+cast send "$fromToken" "approve(address,uint256)" "$router" "$approveAmount" \
   --rpc-url "$RPC_URL" --private-key "$PRIVATE_KEY"
 ```
 
-You can use `MaxUint256` (`115792089237316195423570985008687907853269984665640564039457584007913129639935`)
-if the user prefers a one-time approval over per-swap approvals.
+Do not use `MaxUint256`. An infinite allowance turns every future agent
+action into a potential drain — Permit2 is the right primitive for one-time
+approvals. See AST-W01.
 
 ### Step 4 — If Permit2 path: sign the typed data
 
