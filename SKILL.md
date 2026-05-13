@@ -78,8 +78,20 @@ atomic transaction (multi-asset input).
 
 ```bash
 # Required for execution skills
-export PRIVATE_KEY=0x...           # signer
 export RPC_URL=https://...         # per-chain RPC
+
+# Preferred signer: encrypted Foundry keystore
+export ODOS_KEYSTORE="$HOME/.foundry/keystores/agent"
+export ODOS_KEYSTORE_PASSWORD_FILE="$HOME/.foundry/keystore.pw"
+SIGNER_ARGS=(--keystore "$ODOS_KEYSTORE" --password-file "$ODOS_KEYSTORE_PASSWORD_FILE")
+
+# If you really must use a raw key, keep it out of child-process environments
+# and logs. Prefer reading it from a password manager for a single command:
+# SIGNER_ARGS=(--private-key "$(op read 'op://Private/agent-signer/private key')")
+
+# Last-resort fallback only:
+# export PRIVATE_KEY=0x...         # signer; inherited by child processes
+# SIGNER_ARGS=(--private-key "$PRIVATE_KEY")
 
 # Optional
 export ODOS_API_KEY=...            # partner/enterprise; not needed for public quotes

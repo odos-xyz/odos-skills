@@ -14,8 +14,20 @@ User has explicitly asked to perform a swap and you've confirmed the inputs
 ## Required environment
 
 ```bash
-export PRIVATE_KEY=0x...        # the signer
 export RPC_URL=https://...      # chain RPC
+
+# Preferred signer: encrypted Foundry keystore
+export ODOS_KEYSTORE="$HOME/.foundry/keystores/agent"
+export ODOS_KEYSTORE_PASSWORD_FILE="$HOME/.foundry/keystore.pw"
+SIGNER_ARGS=(--keystore "$ODOS_KEYSTORE" --password-file "$ODOS_KEYSTORE_PASSWORD_FILE")
+
+# Acceptable: read the key from a password manager for one command. Do not
+# export it as PRIVATE_KEY where every child process inherits it.
+# SIGNER_ARGS=(--private-key "$(op read 'op://Private/agent-signer/private key')")
+
+# If you really must, this last-resort fallback is supported but discouraged:
+# export PRIVATE_KEY=0x...       # the signer; inherited by child processes
+# SIGNER_ARGS=(--private-key "$PRIVATE_KEY")
 ```
 
 The signer's address is what receives the output unless `receiver` is set.
@@ -30,7 +42,7 @@ fromToken="0x4200000000000000000000000000000000000006"   # WETH on Base
 toToken="0x833589fcd6edb6e08f4c7c32d4f71b54bda02913"     # USDC on Base
 amount="1000000000000000"                                  # 0.001 WETH
 slippage="0.5"
-userAddr=$(cast wallet address --private-key "$PRIVATE_KEY")
+userAddr=$(cast wallet address "${SIGNER_ARGS[@]}")
 
 quote=$(curl -sS -X POST https://api.odos.xyz/sor/quote/v3 \
   -H 'Content-Type: application/json' \
@@ -73,7 +85,7 @@ router=$(curl -sS "https://api.odos.xyz/info/router/v3/${chainId}" | jq -r '.add
 # for rounding (the Odos router consumes at most $amount per swap).
 approveAmount=$(python3 -c "print(int(${amount}) * 101 // 100)")  # +1%
 cast send "$fromToken" "approve(address,uint256)" "$router" "$approveAmount" \
-  --rpc-url "$RPC_URL" --private-key "$PRIVATE_KEY"
+  --rpc-url "$RPC_URL" "${SIGNER_ARGS[@]}"
 ```
 
 Do not use `MaxUint256`. An infinite allowance turns every future agent
@@ -85,7 +97,7 @@ approvals. See AST-W01.
 ```bash
 # Save the typed-data envelope to a file, then sign with cast
 echo "$permit2Message" > /tmp/permit2.json
-permit2Signature=$(cast wallet sign-typed-data --private-key "$PRIVATE_KEY" --data-file /tmp/permit2.json)
+permit2Signature=$(cast wallet sign "${SIGNER_ARGS[@]}" --data --from-file /tmp/permit2.json)
 ```
 
 ### Step 5 — Assemble (with mandatory simulation)
@@ -126,7 +138,7 @@ cast send "$to" \
   --value "$value" \
   --gas-limit "$gas" \
   --rpc-url "$RPC_URL" \
-  --private-key "$PRIVATE_KEY"
+  "${SIGNER_ARGS[@]}"
 ```
 
 ## Final report to the user

@@ -47,11 +47,13 @@ or paste individual skill bodies into the agent's system prompt.
 | Var | When | Purpose |
 | --- | --- | --- |
 | `ODOS_API_KEY` | Optional | Partner / enterprise API key |
-| `PRIVATE_KEY` | Execution skills only | Hex private key for signing |
 | `RPC_URL` | Execution skills only | Per-chain RPC URL (or pass `--rpc-url` to `cast`) |
+| `ODOS_KEYSTORE` | Execution skills preferred | Encrypted Foundry keystore path for signing |
+| `ODOS_KEYSTORE_PASSWORD_FILE` | Execution skills preferred | Password file for the keystore |
 
-The skills never bake credentials into the markdown. They expect the agent's
-shell environment to have them set.
+Execution skills build `SIGNER_ARGS` from the keystore by default. A raw
+`PRIVATE_KEY` is documented only as a last-resort fallback because child
+processes inherit exported environment variables.
 
 ## Why a Skills package alongside the MCP server?
 
