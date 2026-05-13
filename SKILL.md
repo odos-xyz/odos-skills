@@ -1,6 +1,42 @@
 ---
 name: odos
 description: Use this skill when the user asks to swap tokens, get a swap quote, provide liquidity (zap), look up DeFi token prices, or execute multi-asset swaps via the Odos DEX aggregator. Triggers on phrases like "swap X for Y", "quote", "best route", "multi-asset swap", "zap into pool", "Odos". The skill loads sub-skills under `skills/` for each operation.
+version: 1.0.0
+homepage: https://docs.odos.xyz
+license: MIT
+metadata:
+  openclaw:
+    emoji: "🔀"
+    homepage: https://docs.odos.xyz
+    requires:
+      anyBins:
+        - cast
+        - curl
+        - jq
+    web3:
+      networks: [1, 10, 56, 130, 137, 146, 252, 324, 5000, 8453, 34443, 42161, 43114, 59144]
+      protocol: dex-aggregator
+      policy:
+        allowedContracts:
+          1: ["0x0D05a7D3448512B78fa8A9e46c4872C88C4a0D05"] # Ethereum
+          10: ["0x0D05a7D3448512B78fa8A9e46c4872C88C4a0D05"] # Optimism
+          56: ["0x0D05a7D3448512B78fa8A9e46c4872C88C4a0D05"] # BNB Chain
+          130: ["0x0D05a7D3448512B78fa8A9e46c4872C88C4a0D05"] # Unichain
+          137: ["0x0D05a7D3448512B78fa8A9e46c4872C88C4a0D05"] # Polygon
+          146: ["0x0D05a7D3448512B78fa8A9e46c4872C88C4a0D05"] # Sonic
+          252: ["0x0D05a7D3448512B78fa8A9e46c4872C88C4a0D05"] # Fraxtal
+          324: ["0x0D05a7D3448512B78fa8A9e46c4872C88C4a0D05"] # zkSync Era
+          5000: ["0x0D05a7D3448512B78fa8A9e46c4872C88C4a0D05"] # Mantle
+          8453: ["0x0D05a7D3448512B78fa8A9e46c4872C88C4a0D05"] # Base
+          34443: ["0x0D05a7D3448512B78fa8A9e46c4872C88C4a0D05"] # Mode
+          42161: ["0x0D05a7D3448512B78fa8A9e46c4872C88C4a0D05"] # Arbitrum
+          43114: ["0x0D05a7D3448512B78fa8A9e46c4872C88C4a0D05"] # Avalanche
+          59144: ["0x0D05a7D3448512B78fa8A9e46c4872C88C4a0D05"] # Linea
+        permit2: "0x000000000022D473030F116dDEE9F6B43aC78BA3"
+        slippage:
+          defaultPercent: 0.5
+          maxPercent: 3.0
+          requireConfirmAbovePercent: 5.0
 ---
 
 # Odos DEX aggregator skill
@@ -55,13 +91,17 @@ export ODOS_API_KEY=...            # partner/enterprise; not needed for public q
 1     Ethereum
 10    Optimism
 56    BNB Chain
+130   Unichain
 137   Polygon
+146   Sonic
+252   Fraxtal
+324   zkSync Era
+5000  Mantle
 8453  Base
+34443 Mode
 42161 Arbitrum
 43114 Avalanche
-324   zkSync Era
 59144 Linea
-534352 Scroll
 ```
 
 ## Common chain endpoints (info that every sub-skill may need)
