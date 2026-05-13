@@ -25,7 +25,7 @@ and paying multiple gas fees.
 ```bash
 chainId=8453
 poolAddress="0x..."   # the LP pool the user wants to enter
-userAddr=$(cast wallet address --private-key "$PRIVATE_KEY")
+userAddr=$(cast wallet address "${SIGNER_ARGS[@]}")
 
 quote=$(curl -sS -X POST https://api.odos.xyz/zaps/quote \
   -H 'Content-Type: application/json' \
@@ -61,7 +61,7 @@ approval before continuing.
 # the right `to` address. Approve each non-native input token for at least
 # the amount being zapped.
 cast send "$inputToken" "approve(address,uint256)" "$zapRouter" "$amount" \
-  --rpc-url "$RPC_URL" --private-key "$PRIVATE_KEY"
+  --rpc-url "$RPC_URL" "${SIGNER_ARGS[@]}"
 ```
 
 ### Step 4 — Assemble + broadcast
@@ -79,7 +79,7 @@ value=$(echo "$assembled" | jq -r '.transaction.value')
 gas=$(echo "$assembled" | jq -r '.transaction.gas')
 
 cast send "$to" --data "$data" --value "$value" --gas-limit "$gas" \
-  --rpc-url "$RPC_URL" --private-key "$PRIVATE_KEY"
+  --rpc-url "$RPC_URL" "${SIGNER_ARGS[@]}"
 ```
 
 ## Withdraw flow

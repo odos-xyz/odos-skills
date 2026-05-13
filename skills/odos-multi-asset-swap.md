@@ -32,7 +32,7 @@ with `proportion` values that sum to 1.
 
 ```bash
 chainId=8453
-userAddr=$(cast wallet address --private-key "$PRIVATE_KEY")
+userAddr=$(cast wallet address "${SIGNER_ARGS[@]}")
 
 # Three inputs, one output (USDC on Base)
 quote=$(curl -sS -X POST https://api.odos.xyz/sor/quote/v3 \
@@ -84,7 +84,7 @@ amounts=$(echo "$quote" | jq -r '.inAmounts[]')
 
 paste <(echo "$inputs") <(echo "$amounts") | while IFS=$'\t' read -r tok amt; do
   cast send "$tok" "approve(address,uint256)" "$router" "$amt" \
-    --rpc-url "$RPC_URL" --private-key "$PRIVATE_KEY"
+    --rpc-url "$RPC_URL" "${SIGNER_ARGS[@]}"
 done
 ```
 
